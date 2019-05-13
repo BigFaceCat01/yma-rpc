@@ -14,5 +14,6 @@ public final class CommonConstants {
     public static final String PROTOCOL_JAR = "jar";
     public static final String DOT_CLASS = ".class";
     public static final String EMPTY_STRING = "";
+    public static final int INT_BYTE = 4;
 
 }

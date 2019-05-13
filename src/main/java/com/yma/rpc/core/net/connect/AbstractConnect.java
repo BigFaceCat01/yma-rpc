@@ -16,12 +16,31 @@ public abstract class AbstractConnect {
     private static ConcurrentHashMap<String, AbstractConnect> connectPool;
     private static ConcurrentHashMap<String, Object> lockPool = new ConcurrentHashMap<>(16);
 
+    /**
+     * 初始化客户端连接
+     * @param address 连接的服务器的地址
+     * @param serializer 数据序列化方式
+     * @param rpcInvokerFactory 调用工程
+     * @throws Exception 异常
+     */
     public abstract void init(String address, AbstractSerializer serializer, RpcInvokerFactory rpcInvokerFactory) throws Exception;
 
+    /**
+     * 连接关闭实现
+     */
     public abstract void close();
 
+    /**
+     * 发送一个调用请求
+     * @param rpcRequest 请求信息
+     * @throws Exception 异常
+     */
     public abstract void send(RpcRequest rpcRequest) throws Exception;
 
+    /**
+     * 判断连接是否还能使用，不能则会移除
+     * @return 布尔
+     */
     public abstract boolean isAlive();
 
 

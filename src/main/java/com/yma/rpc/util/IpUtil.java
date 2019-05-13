@@ -23,11 +23,10 @@ public class IpUtil {
 
 
     public static String getLocalHost() {
-        InetAddress addr = null;
+        InetAddress addr ;
         try {
             addr = InetAddress.getLocalHost();
-            String ip = addr.getHostAddress();
-            return ip;
+            return addr.getHostAddress();
         } catch (UnknownHostException e) {
             throw new RpcException(e);
         }

@@ -84,11 +84,7 @@ public class RpcConfig {
         }
     }
 
-    private RpcConfig(){
-
-    }
-
-    public RpcConfig(String registryCenterAddress,
+    private RpcConfig(String registryCenterAddress,
                      int port,
                      String basePackage,
                      Router router,

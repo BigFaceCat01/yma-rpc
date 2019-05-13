@@ -7,16 +7,14 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.util.List;
 
+import com.yma.rpc.constant.CommonConstants;
+
 /**
  * 这里传输协议使用 length + data 协议
  * @author Created by huang xiao bao
  * @date 2019-05-07 09:10:04
  */
 public class NettyDecode extends ByteToMessageDecoder {
-    /**
-     * 整数占用字节数
-     */
-    public static final int INT_BYTE = 4;
 
     private AbstractSerializer serializer;
     private Class<?> target;
@@ -28,11 +26,10 @@ public class NettyDecode extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        /**
-         * 读取数据长度
-         */
-        if(in.readableBytes() < INT_BYTE){
+        //读取数据长度
+        if(in.readableBytes() < CommonConstants.INT_BYTE){
             //若长度不足整数字节，不做操作
+            return;
         }
         //标记当前位置
         in.markReaderIndex();
