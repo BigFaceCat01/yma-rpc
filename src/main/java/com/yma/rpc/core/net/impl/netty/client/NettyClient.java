@@ -13,7 +13,12 @@ import com.yma.rpc.serializer.AbstractSerializer;
 public class NettyClient extends AbstractClient {
 
     @Override
-    public void send(String address, RpcRequest rpcRequest, AbstractSerializer serializer, Class<? extends AbstractConnect> connectImpl, RpcInvokerFactory rpcInvokerFactory) throws Exception{
-        AbstractConnect.doSend(address,rpcRequest,serializer, connectImpl,rpcInvokerFactory);
+    public void send(String address, RpcRequest rpcRequest, RpcInvokerFactory rpcInvokerFactory) throws Exception{
+        AbstractConnect.doSend(address,rpcRequest,rpcInvokerFactory);
+    }
+
+    @Override
+    public void close() {
+        AbstractConnect.doClose();
     }
 }

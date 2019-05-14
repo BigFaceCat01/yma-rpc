@@ -11,11 +11,10 @@ public abstract class AbstractServer {
     /**
      * 初始化服务器
      * @param address 监听地址
-     * @param serializer 数据序列化方式
      * @param rpcProviderFactory 调用实现类注册工厂
      * @throws Exception 异常
      */
-    public abstract void init(String address, AbstractSerializer serializer, RpcProviderFactory rpcProviderFactory) throws Exception;
+    public abstract void init(String address, RpcProviderFactory rpcProviderFactory) throws Exception;
 
     /**
      * 关闭服务器

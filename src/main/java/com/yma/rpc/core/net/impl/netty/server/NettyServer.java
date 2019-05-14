@@ -14,20 +14,25 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
+import java.util.Objects;
 
 /**
  * @author Created by huang xiao bao
  * @date 2019-05-11 11:22:25
  */
+@Slf4j
 public class NettyServer extends AbstractServer {
     private EventLoopGroup workGroup;
     private EventLoopGroup bossGroup;
     private Channel channel;
+    private String address;
 
     @Override
-    public void init(String address, AbstractSerializer serializer, RpcProviderFactory rpcProviderFactory) throws Exception {
+    public void init(String address, RpcProviderFactory rpcProviderFactory) throws Exception {
+        this.address = address;
         Object[] ipPort = IpUtil.parseIpPort(address);
         String host = (String) ipPort[0];
         int port = (int) ipPort[1];
@@ -36,6 +41,7 @@ public class NettyServer extends AbstractServer {
 
         this.workGroup = new NioEventLoopGroup();
         this.bossGroup = new NioEventLoopGroup();
+        AbstractSerializer serializer = rpcProviderFactory.getRpcConfig().getSerializer();
         server.group(bossGroup, workGroup)
                 .channel(NioServerSocketChannel.class)
                 .option(ChannelOption.SO_BACKLOG, 100)
@@ -52,13 +58,21 @@ public class NettyServer extends AbstractServer {
         this.channel = server.bind(new InetSocketAddress(host, port))
                 .sync()
                 .channel();
+        log.info(">>>>>>> run server in {} success",address);
         channel.closeFuture().sync();
     }
 
     @Override
     public void close(){
-        this.workGroup.shutdownGracefully();
-        this.bossGroup.shutdownGracefully();
-        this.channel.close();
+        if(Objects.nonNull(workGroup)){
+            this.workGroup.shutdownGracefully();
+        }
+        if(Objects.nonNull(bossGroup)){
+            this.bossGroup.shutdownGracefully();
+        }
+        if(Objects.nonNull(channel)){
+            this.channel.close();
+        }
+        log.info(">>>>>>> server in {} destroy",address);
     }
 }
