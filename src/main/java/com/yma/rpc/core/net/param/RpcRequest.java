@@ -15,6 +15,7 @@ public class RpcRequest implements Serializable {
     private Long requestId;
     private String className;
     private String methodName;
+    private Long createTime;
     private Class<?>[] methodParam;
     private Object[] params;
 }

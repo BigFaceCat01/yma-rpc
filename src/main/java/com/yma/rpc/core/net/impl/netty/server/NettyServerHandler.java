@@ -3,7 +3,7 @@ package com.yma.rpc.core.net.impl.netty.server;
 import com.yma.rpc.core.net.param.RpcRequest;
 import com.yma.rpc.core.net.param.RpcResponse;
 import com.yma.rpc.core.provider.RpcProviderFactory;
-import com.yma.rpc.util.ThrowableUtil;
+import com.yma.rpc.util.StringUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequest> 
         } catch (Exception e) {
             return RpcResponse.builder()
                     .requestId(rpcRequest.getRequestId())
-                    .exception(ThrowableUtil.toString(e))
+                    .exception(StringUtil.toString(e))
                     .build();
         }
     }

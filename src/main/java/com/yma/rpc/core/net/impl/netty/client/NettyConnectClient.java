@@ -16,20 +16,25 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
+import java.util.Objects;
 
 /**
  * @author Created by huang xiao bao
  * @date 2019-05-11 15:41:42
  */
+@Slf4j
 public class NettyConnectClient extends AbstractConnect {
 
     private EventLoopGroup workGroup;
     private Channel channel;
+    private String address;
 
     @Override
-    public void init(String address, AbstractSerializer serializer, RpcInvokerFactory rpcInvokerFactory) throws Exception{
+    public void init(String address, RpcInvokerFactory rpcInvokerFactory) throws Exception{
+        this.address = address;
         Object[] ipPort = IpUtil.parseIpPort(address);
         String host = (String) ipPort[0];
         int port = (int) ipPort[1];
@@ -38,7 +43,7 @@ public class NettyConnectClient extends AbstractConnect {
         Bootstrap client = new Bootstrap();
 
         this.workGroup = new NioEventLoopGroup();
-
+        AbstractSerializer serializer = rpcInvokerFactory.getRpcConfig().getSerializer();
         client.group(workGroup)
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<SocketChannel>() {
@@ -57,8 +62,13 @@ public class NettyConnectClient extends AbstractConnect {
 
     @Override
     public void close() {
-        workGroup.shutdownGracefully();
-        this.channel.close();
+        if(Objects.nonNull(workGroup)) {
+            workGroup.shutdownGracefully();
+        }
+        if(Objects.nonNull(workGroup)){
+            this.channel.close();
+        }
+        log.info(">>>>>>The client disconnects at {}",address);
     }
 
     @Override

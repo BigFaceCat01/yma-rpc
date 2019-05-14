@@ -2,12 +2,13 @@ package com.yma.rpc.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Objects;
 
 /**
  * @author Created by huang xiao bao
  * @date 2019-05-13 18:38:44
  */
-public class ThrowableUtil {
+public final class StringUtil {
 
     /**
      * 将异常转换为字符串
@@ -21,4 +22,14 @@ public class ThrowableUtil {
         return stringWriter.toString();
     }
 
+    /**
+     * 判断字符串是否为空
+     * @param o 字符串
+     * @return 布尔
+     */
+    public static boolean isEmpty(String o){
+        return Objects.isNull(o) || o.trim().length() == 0;
+    }
+
+    private StringUtil(){}
 }

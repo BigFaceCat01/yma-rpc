@@ -12,30 +12,31 @@ import java.lang.reflect.Proxy;
 import java.util.Objects;
 
 /**
+ * 用于生产代理bean
  * @author Created by huang xiao bao
  * @date 2019-05-11 11:05:38
  */
-public class InvokerProxyBean {
+public class InvokerProxyBean<T> {
     private String serviceName;
     private Class<?>[] interfaces;
     private RpcRequest rpcRequest;
     private Object proxyBean;
-    private RpcInvokerFactory rpcInvokerFactory;
+    private RpcFactory rpcFactory;
     private BaseCallback callback;
     private boolean sync;
 
 
-    public static InvokerProxyBean newProxyBean(Class<?> source, RpcFactory rpcFactory, BaseCallback resultCallBack){
+    public static <T> InvokerProxyBean<T> newProxyBean(Class<T> source, RpcFactory rpcFactory, BaseCallback resultCallBack){
         RpcApi rpcApi = source.getDeclaredAnnotation(RpcApi.class);
         if(Objects.isNull(rpcApi)){
-            throw new RpcException(source.getName() + ": RpcApi not present");
+            throw new RpcException(source.getName() + ": @RpcApi not present");
         }
         RpcRequest rpcRequest = RpcRequest.builder()
                 .className(source.getName())
                 .build();
         rpcFactory.getServiceRegistry().refreshData(rpcApi.serviceName(),rpcApi.address());
-        return new InvokerProxyBean(
-                rpcFactory.getRpcInvokerFactory()
+        return new InvokerProxyBean<>(
+                rpcFactory
                 ,rpcApi.serviceName()
                 ,rpcRequest,
                 resultCallBack,
@@ -43,17 +44,19 @@ public class InvokerProxyBean {
                 new Class<?>[]{source});
     }
 
-    public static InvokerProxyBean newProxyBean(Class<?> source,RpcFactory rpcFactory){
+    public static <T> InvokerProxyBean<T> newProxyBean(Class<T> source,RpcFactory rpcFactory){
         return newProxyBean(source,rpcFactory,null);
     }
 
-    public Object getObject(){
+    @SuppressWarnings("unchecked")
+    public T getObject(){
         if(Objects.nonNull(proxyBean)){
-            return proxyBean;
+            return (T) proxyBean;
         }
         synchronized (InvokerProxyBean.class) {
+            final RpcInvokerFactory rpcInvokerFactory = rpcFactory.getRpcInvokerFactory();
             if(Objects.nonNull(proxyBean)){
-                return proxyBean;
+                return (T) proxyBean;
             }
             this.proxyBean = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
                     interfaces,
@@ -61,6 +64,7 @@ public class InvokerProxyBean {
                         RpcRequest rpcRequest = getRpcRequest();
                         rpcRequest.setRequestId(SnowFlakesUtil.nextId());
                         rpcRequest.setMethodName(method.getName());
+                        rpcRequest.setCreateTime(System.currentTimeMillis());
                         rpcRequest.setMethodParam(method.getParameterTypes());
                         rpcRequest.setParams(args);
                         if (sync) {
@@ -72,17 +76,17 @@ public class InvokerProxyBean {
                             return null;
                         }
                     });
-            return proxyBean;
+            return (T)proxyBean;
         }
 
     }
 
-    public RpcRequest getRpcRequest() {
+    private RpcRequest getRpcRequest() {
         return rpcRequest;
     }
 
-    private InvokerProxyBean(RpcInvokerFactory rpcInvokerFactory, String serviceName, RpcRequest rpcRequest,BaseCallback callback,boolean sync,Class<?>[] interfaces){
-        this.rpcInvokerFactory = rpcInvokerFactory;
+    private InvokerProxyBean(RpcFactory rpcFactory, String serviceName, RpcRequest rpcRequest,BaseCallback callback,boolean sync,Class<?>[] interfaces){
+        this.rpcFactory = rpcFactory;
         this.serviceName = serviceName;
         this.rpcRequest = rpcRequest;
         this.callback = callback;

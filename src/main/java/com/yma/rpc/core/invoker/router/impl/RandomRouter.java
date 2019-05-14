@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * 路由方式为随机
  * @author Created by huang xiao bao
  * @date 2019-05-11 18:10:27
  */

@@ -1,5 +1,6 @@
 package com.yma.rpc.core.net.connect;
 
+import com.yma.rpc.configuration.RpcConfig;
 import com.yma.rpc.core.invoker.RpcInvokerFactory;
 import com.yma.rpc.core.net.param.RpcRequest;
 import com.yma.rpc.serializer.AbstractSerializer;
@@ -19,11 +20,10 @@ public abstract class AbstractConnect {
     /**
      * 初始化客户端连接
      * @param address 连接的服务器的地址
-     * @param serializer 数据序列化方式
      * @param rpcInvokerFactory 调用工程
      * @throws Exception 异常
      */
-    public abstract void init(String address, AbstractSerializer serializer, RpcInvokerFactory rpcInvokerFactory) throws Exception;
+    public abstract void init(String address, RpcInvokerFactory rpcInvokerFactory) throws Exception;
 
     /**
      * 连接关闭实现
@@ -44,13 +44,21 @@ public abstract class AbstractConnect {
     public abstract boolean isAlive();
 
 
-    public static void doSend(String address, RpcRequest rpcRequest, AbstractSerializer serializer, Class<? extends AbstractConnect> connectImpl, RpcInvokerFactory rpcInvokerFactory) throws Exception {
-        AbstractConnect connect = getConnect(address, serializer, connectImpl,rpcInvokerFactory);
+    public static void doSend(String address, RpcRequest rpcRequest, RpcInvokerFactory rpcInvokerFactory) throws Exception {
+        AbstractConnect connect = getConnect(address,rpcInvokerFactory);
         connect.send(rpcRequest);
     }
 
+    public static void doClose(){
+        if(Objects.isNull(connectPool)){
+            return;
+        }
+        connectPool.entrySet().forEach(connect->connect.getValue().close());
+    }
 
-    private static AbstractConnect getConnect(String address, AbstractSerializer serializer, Class<? extends AbstractConnect> connectImpl, RpcInvokerFactory rpcInvokerFactory) throws Exception {
+
+    private static AbstractConnect getConnect(String address, RpcInvokerFactory rpcInvokerFactory) throws Exception {
+        RpcConfig rpcConfig = rpcInvokerFactory.getRpcConfig();
 
         if (Objects.isNull(connectPool)) {
             synchronized (AbstractConnect.class) {
@@ -78,8 +86,8 @@ public abstract class AbstractConnect {
                 connect.close();
                 connectPool.remove(address);
             }
-            AbstractConnect con = connectImpl.newInstance();
-            con.init(address, serializer,rpcInvokerFactory);
+            AbstractConnect con = rpcConfig.getNetType().getConnectImpl().newInstance();
+            con.init(address,rpcInvokerFactory);
             connectPool.put(address, con);
             return con;
         }
