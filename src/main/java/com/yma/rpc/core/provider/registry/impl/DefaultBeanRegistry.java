@@ -1,6 +1,5 @@
 package com.yma.rpc.core.provider.registry.impl;
 
-import com.yma.rpc.constant.CommonConstants;
 import com.yma.rpc.core.provider.annotation.Rpc;
 import com.yma.rpc.core.provider.registry.BeanRegistry;
 import com.yma.rpc.util.ClassScanUtil;
@@ -24,13 +23,9 @@ public class DefaultBeanRegistry implements BeanRegistry {
             if (Objects.isNull(rpc)) {
                 return;
             }
-            String iface = rpc.iface();
+            Class iface = rpc.iface();
             String interfaceName;
-            if (CommonConstants.EMPTY_STRING.equals(iface.trim())) {
-                interfaceName = source.getInterfaces()[0].getName();
-            } else {
-                interfaceName = rpc.iface();
-            }
+            interfaceName = iface.getName();
             Object o = null;
             try {
                 o = source.newInstance();

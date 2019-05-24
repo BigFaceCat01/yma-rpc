@@ -26,7 +26,6 @@ public class NettyDecode extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        //TODO 未处理粘包、拆包
         //读取数据长度
         if(in.readableBytes() < CommonConstants.INT_BYTE){
             //若长度不足整数字节，不做操作

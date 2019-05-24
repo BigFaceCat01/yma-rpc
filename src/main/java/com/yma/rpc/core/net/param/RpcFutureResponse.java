@@ -69,7 +69,7 @@ public class RpcFutureResponse implements Future<RpcResponse> {
             }
         }
         if (!isDone()) {
-            throw new RuntimeException("xxl-rpc, request timeout at:" + System.currentTimeMillis() + ", request:" + rpcResponse.toString());
+            throw new RuntimeException("request timeout at:" + System.currentTimeMillis() + ", request:" + rpcResponse.toString());
         }
         return rpcResponse;
     }

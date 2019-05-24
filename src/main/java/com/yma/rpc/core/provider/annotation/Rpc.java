@@ -11,8 +11,8 @@ import java.lang.annotation.*;
 @Inherited
 public @interface Rpc {
     /**
-     * 若有多个接口，需指定接口名称，默认取第一个接口
-     * @return
+     * 指定实现的接口类名
+     * @return 接口类
      */
-    String iface() default "";
+    Class<?> iface();
 }
